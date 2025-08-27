@@ -26,12 +26,12 @@ async function getImagesForCardInfo(
     // include language
     const q = `set:${set} number:${escapeColon(
       number
-    )} name:"${name}" include:extras unique:prints lang:${lang}`; // NEW
+    )} !"${name}" include:extras unique:prints lang:${lang}`; // NEW
     let urls = await fetchPngsByQuery(q);
     if (!urls.length && fallbackToEnglish && lang !== "en") {
       const qEn = `set:${set} number:${escapeColon(
         number
-      )} name:"${name}" include:extras unique:prints lang:en`; // NEW
+      )} !"${name}" include:extras unique:prints lang:en`; // NEW
       urls = await fetchPngsByQuery(qEn);
     }
     if (urls.length) return urls;
@@ -40,10 +40,10 @@ async function getImagesForCardInfo(
 
   // 2) Set + name (all printings in set for that name)
   if (set && !number) {
-    const q = `set:${set} name:"${name}" include:extras unique:${unique} lang:${lang}`; // NEW
+    const q = `set:${set} !"${name}" include:extras unique:${unique} lang:${lang}`; // NEW
     let urls = await fetchPngsByQuery(q);
     if (!urls.length && fallbackToEnglish && lang !== "en") {
-      const qEn = `set:${set} name:"${name}" include:extras unique:${unique} lang:en`; // NEW
+      const qEn = `set:${set} !"${name}" include:extras unique:${unique} lang:en`; // NEW
       urls = await fetchPngsByQuery(qEn);
     }
     if (urls.length) return urls;
@@ -98,7 +98,12 @@ async function fetchPngsByQuery(query) {
 }
 
 module.exports.getImagesForCardInfo = getImagesForCardInfo;
-module.exports.getScryfallPngImagesForCard = async (cardName, unique = "art", language = "en", fallbackToEnglish = true) => {
+module.exports.getScryfallPngImagesForCard = async (
+  cardName,
+  unique = "art",
+  language = "en",
+  fallbackToEnglish = true
+) => {
   // name-only helper with language support
   const q = `!"${cardName}" include:extras unique:${unique} lang:${(language || "en").toLowerCase()}`;
   let urls = await fetchPngsByQuery(q);
@@ -108,7 +113,11 @@ module.exports.getScryfallPngImagesForCard = async (cardName, unique = "art", la
   }
   return urls;
 };
-module.exports.getScryfallPngImagesForCardPrints = async (name, language = "en", fallbackToEnglish = true) => {
+module.exports.getScryfallPngImagesForCardPrints = async (
+  name,
+  language = "en",
+  fallbackToEnglish = true
+) => {
   const q = `!"${name}" include:extras unique:prints lang:${(language || "en").toLowerCase()}`;
   let urls = await fetchPngsByQuery(q);
   if (!urls.length && fallbackToEnglish && language !== "en") {
